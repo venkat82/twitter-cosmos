@@ -1,9 +1,11 @@
 import { txClient, queryClient, MissingWalletError , registry} from './module'
 
 import { Params } from "./module/types/twitter/params"
+import { UserData } from "./module/types/twitter/user_data"
+import { UserFeed } from "./module/types/twitter/user_feed"
 
 
-export { Params };
+export { Params, UserData, UserFeed };
 
 async function initTxClient(vuexGetters) {
 	return await txClient(vuexGetters['common/wallet/signer'], {
@@ -42,9 +44,15 @@ function getStructure(template) {
 const getDefaultState = () => {
 	return {
 				Params: {},
+				UserData: {},
+				UserDataAll: {},
+				UserFeed: {},
+				UserFeedAll: {},
 				
 				_Structure: {
 						Params: getStructure(Params.fromPartial({})),
+						UserData: getStructure(UserData.fromPartial({})),
+						UserFeed: getStructure(UserFeed.fromPartial({})),
 						
 		},
 		_Registry: registry,
@@ -78,6 +86,30 @@ export default {
 						(<any> params).query=null
 					}
 			return state.Params[JSON.stringify(params)] ?? {}
+		},
+				getUserData: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.UserData[JSON.stringify(params)] ?? {}
+		},
+				getUserDataAll: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.UserDataAll[JSON.stringify(params)] ?? {}
+		},
+				getUserFeed: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.UserFeed[JSON.stringify(params)] ?? {}
+		},
+				getUserFeedAll: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.UserFeedAll[JSON.stringify(params)] ?? {}
 		},
 				
 		getTypeStructure: (state) => (type) => {
@@ -136,6 +168,186 @@ export default {
 		
 		
 		
+		
+		 		
+		
+		
+		async QueryUserData({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const queryClient=await initQueryClient(rootGetters)
+				let value= (await queryClient.queryUserData( key.index)).data
+				
+					
+				commit('QUERY', { query: 'UserData', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryUserData', payload: { options: { all }, params: {...key},query }})
+				return getters['getUserData']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryUserData API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryUserDataAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const queryClient=await initQueryClient(rootGetters)
+				let value= (await queryClient.queryUserDataAll(query)).data
+				
+					
+				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
+					let next_values=(await queryClient.queryUserDataAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					value = mergeResults(value, next_values);
+				}
+				commit('QUERY', { query: 'UserDataAll', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryUserDataAll', payload: { options: { all }, params: {...key},query }})
+				return getters['getUserDataAll']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryUserDataAll API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryUserFeed({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const queryClient=await initQueryClient(rootGetters)
+				let value= (await queryClient.queryUserFeed( key.index)).data
+				
+					
+				commit('QUERY', { query: 'UserFeed', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryUserFeed', payload: { options: { all }, params: {...key},query }})
+				return getters['getUserFeed']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryUserFeed API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryUserFeedAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const queryClient=await initQueryClient(rootGetters)
+				let value= (await queryClient.queryUserFeedAll(query)).data
+				
+					
+				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
+					let next_values=(await queryClient.queryUserFeedAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					value = mergeResults(value, next_values);
+				}
+				commit('QUERY', { query: 'UserFeedAll', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryUserFeedAll', payload: { options: { all }, params: {...key},query }})
+				return getters['getUserFeedAll']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryUserFeedAll API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		async sendMsgAddFollower({ rootGetters }, { value, fee = [], memo = '' }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgAddFollower(value)
+				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
+	gas: "200000" }, memo})
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgAddFollower:Init Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new Error('TxClient:MsgAddFollower:Send Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
+		async sendMsgAddTweet({ rootGetters }, { value, fee = [], memo = '' }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgAddTweet(value)
+				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
+	gas: "200000" }, memo})
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgAddTweet:Init Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new Error('TxClient:MsgAddTweet:Send Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
+		async sendMsgFetchFeed({ rootGetters }, { value, fee = [], memo = '' }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgFetchFeed(value)
+				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
+	gas: "200000" }, memo})
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgFetchFeed:Init Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new Error('TxClient:MsgFetchFeed:Send Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
+		
+		async MsgAddFollower({ rootGetters }, { value }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgAddFollower(value)
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgAddFollower:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgAddFollower:Create Could not create message: ' + e.message)
+				}
+			}
+		},
+		async MsgAddTweet({ rootGetters }, { value }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgAddTweet(value)
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgAddTweet:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgAddTweet:Create Could not create message: ' + e.message)
+				}
+			}
+		},
+		async MsgFetchFeed({ rootGetters }, { value }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgFetchFeed(value)
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgFetchFeed:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgFetchFeed:Create Could not create message: ' + e.message)
+				}
+			}
+		},
 		
 	}
 }

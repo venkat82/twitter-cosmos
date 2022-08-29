@@ -24,7 +24,19 @@ var (
 )
 
 const (
-// this line is used by starport scaffolding # simapp/module/const
+	opWeightMsgAddTweet = "op_weight_msg_add_tweet"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgAddTweet int = 100
+
+	opWeightMsgAddFollower = "op_weight_msg_add_follower"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgAddFollower int = 100
+
+	opWeightMsgFetchFeed = "op_weight_msg_fetch_feed"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgFetchFeed int = 100
+
+	// this line is used by starport scaffolding # simapp/module/const
 )
 
 // GenerateGenesisState creates a randomized GenState of the module
@@ -57,6 +69,39 @@ func (am AppModule) RegisterStoreDecoder(_ sdk.StoreDecoderRegistry) {}
 // WeightedOperations returns the all the gov module operations with their respective weights.
 func (am AppModule) WeightedOperations(simState module.SimulationState) []simtypes.WeightedOperation {
 	operations := make([]simtypes.WeightedOperation, 0)
+
+	var weightMsgAddTweet int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgAddTweet, &weightMsgAddTweet, nil,
+		func(_ *rand.Rand) {
+			weightMsgAddTweet = defaultWeightMsgAddTweet
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgAddTweet,
+		twittersimulation.SimulateMsgAddTweet(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
+	var weightMsgAddFollower int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgAddFollower, &weightMsgAddFollower, nil,
+		func(_ *rand.Rand) {
+			weightMsgAddFollower = defaultWeightMsgAddFollower
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgAddFollower,
+		twittersimulation.SimulateMsgAddFollower(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
+	var weightMsgFetchFeed int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgFetchFeed, &weightMsgFetchFeed, nil,
+		func(_ *rand.Rand) {
+			weightMsgFetchFeed = defaultWeightMsgFetchFeed
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgFetchFeed,
+		twittersimulation.SimulateMsgFetchFeed(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
 
 	// this line is used by starport scaffolding # simapp/module/operation
 

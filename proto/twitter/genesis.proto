@@ -3,6 +3,8 @@ package venkat.twitter.twitter;
 
 import "gogoproto/gogo.proto";
 import "twitter/params.proto";
+import "twitter/user_data.proto";
+import "twitter/user_feed.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
 option go_package = "github/venkat/twitter/x/twitter/types";
@@ -10,5 +12,7 @@ option go_package = "github/venkat/twitter/x/twitter/types";
 // GenesisState defines the twitter module's genesis state.
 message GenesisState {
   Params params = 1 [(gogoproto.nullable) = false];
+  repeated UserData userDataList = 2 [(gogoproto.nullable) = false];
+  repeated UserFeed userFeedList = 3 [(gogoproto.nullable) = false];
   // this line is used by starport scaffolding # genesis/proto/state
 }

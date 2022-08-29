@@ -5,6 +5,8 @@ import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "twitter/params.proto";
+import "twitter/user_data.proto";
+import "twitter/user_feed.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "github/venkat/twitter/x/twitter/types";
@@ -15,7 +17,27 @@ service Query {
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/venkat/twitter/twitter/params";
   }
-  // this line is used by starport scaffolding # 2
+  // Queries a UserData by index.
+	rpc UserData(QueryGetUserDataRequest) returns (QueryGetUserDataResponse) {
+		option (google.api.http).get = "/venkat/twitter/twitter/user_data/{index}";
+	}
+
+	// Queries a list of UserData items.
+	rpc UserDataAll(QueryAllUserDataRequest) returns (QueryAllUserDataResponse) {
+		option (google.api.http).get = "/venkat/twitter/twitter/user_data";
+	}
+
+// Queries a UserFeed by index.
+	rpc UserFeed(QueryGetUserFeedRequest) returns (QueryGetUserFeedResponse) {
+		option (google.api.http).get = "/venkat/twitter/twitter/user_feed/{index}";
+	}
+
+	// Queries a list of UserFeed items.
+	rpc UserFeedAll(QueryAllUserFeedRequest) returns (QueryAllUserFeedResponse) {
+		option (google.api.http).get = "/venkat/twitter/twitter/user_feed";
+	}
+
+// this line is used by starport scaffolding # 2
 }
 
 // QueryParamsRequest is request type for the Query/Params RPC method.
@@ -25,6 +47,42 @@ message QueryParamsRequest {}
 message QueryParamsResponse {
   // params holds all the parameters of this module.
   Params params = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryGetUserDataRequest {
+	  string index = 1;
+
+}
+
+message QueryGetUserDataResponse {
+	UserData userData = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllUserDataRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllUserDataResponse {
+	repeated UserData userData = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetUserFeedRequest {
+	  string index = 1;
+
+}
+
+message QueryGetUserFeedResponse {
+	UserFeed userFeed = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllUserFeedRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllUserFeedResponse {
+	repeated UserFeed userFeed = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
 // this line is used by starport scaffolding # 3

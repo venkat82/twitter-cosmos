@@ -8,5 +8,5 @@ import (
 
 // x/twitter module sentinel errors
 var (
-	ErrSample = sdkerrors.Register(ModuleName, 1100, "sample error")
+	ErrCantFetchUserData = sdkerrors.Register(ModuleName, 1103, "cannot fetch user data for %s")
 )

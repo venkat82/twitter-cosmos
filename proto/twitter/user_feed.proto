@@ -1,0 +1,11 @@
+syntax = "proto3";
+package venkat.twitter.twitter;
+
+option go_package = "github/venkat/twitter/x/twitter/types";
+
+message UserFeed {
+  string index = 1; 
+  repeated string feed = 2; 
+  
+}
+

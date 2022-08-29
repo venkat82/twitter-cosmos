@@ -1,0 +1,12 @@
+syntax = "proto3";
+package venkat.twitter.twitter;
+
+option go_package = "github/venkat/twitter/x/twitter/types";
+
+message UserData {
+  string index = 1; 
+  repeated string tweets = 2; 
+  repeated string followers = 3; 
+  
+}
+

@@ -7,7 +7,34 @@ option go_package = "github/venkat/twitter/x/twitter/types";
 
 // Msg defines the Msg service.
 service Msg {
-    // this line is used by starport scaffolding # proto/tx/rpc
+      rpc AddTweet(MsgAddTweet) returns (MsgAddTweetResponse);
+  rpc AddFollower(MsgAddFollower) returns (MsgAddFollowerResponse);
+  rpc FetchFeed(MsgFetchFeed) returns (MsgFetchFeedResponse);
+// this line is used by starport scaffolding # proto/tx/rpc
+}
+
+message MsgAddTweet {
+  string creator = 1;
+  string content = 2;
+}
+
+message MsgAddTweetResponse {
+}
+
+message MsgAddFollower {
+  string creator = 1;
+  string followerId = 2;
+}
+
+message MsgAddFollowerResponse {
+}
+
+message MsgFetchFeed {
+  string creator = 1;
+}
+
+message MsgFetchFeedResponse {
+  repeated string followerTweets = 1;
 }
 
 // this line is used by starport scaffolding # proto/tx/message

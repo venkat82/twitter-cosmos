@@ -14,6 +14,22 @@ func TestGenesis(t *testing.T) {
 	genesisState := types.GenesisState{
 		Params: types.DefaultParams(),
 
+		UserDataList: []types.UserData{
+			{
+				Index: "0",
+			},
+			{
+				Index: "1",
+			},
+		},
+		UserFeedList: []types.UserFeed{
+			{
+				Index: "0",
+			},
+			{
+				Index: "1",
+			},
+		},
 		// this line is used by starport scaffolding # genesis/test/state
 	}
 
@@ -25,5 +41,7 @@ func TestGenesis(t *testing.T) {
 	nullify.Fill(&genesisState)
 	nullify.Fill(got)
 
+	require.ElementsMatch(t, genesisState.UserDataList, got.UserDataList)
+	require.ElementsMatch(t, genesisState.UserFeedList, got.UserFeedList)
 	// this line is used by starport scaffolding # genesis/test/assert
 }
